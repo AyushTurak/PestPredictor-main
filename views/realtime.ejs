@@ -1,0 +1,40 @@
+<%- include("partials/header.ejs") %>
+  <video id="video" autoplay></video>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <img id="capturedImage" alt="Captured Image" />
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const capturedImage = document.getElementById('capturedImage');
+
+    // Access the camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+
+        // Wait for the video metadata to be loaded
+        video.addEventListener('loadedmetadata', () => {
+          // Capture image after 10 seconds
+          setTimeout(() => {
+            // Set canvas dimensions equal to the video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw the current video frame onto the canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert canvas to an image
+            const imageData = canvas.toDataURL('image/png');
+
+            // Display the captured image
+            capturedImage.src = imageData;
+            capturedImage.style.display = 'block';
+          }, 10000);  // 10 seconds
+        });
+      })
+      .catch((err) => {
+        console.error('Error accessing camera: ', err);
+      });
+  </script>
+  <%- include("partials/footer.ejs") %>

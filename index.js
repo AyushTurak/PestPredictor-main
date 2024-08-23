@@ -57,11 +57,15 @@ app.get("/pest", (req, res) => {
   res.render("pest.ejs");
 });
 
+app.get("/realtime", (req, res) => {
+  res.render("realtime.ejs");
+});
+
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
 app.post("/disease", (req, res) => {
   const image = req.body.dInput;
-  
+
 })

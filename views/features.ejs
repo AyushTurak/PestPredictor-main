@@ -2,18 +2,25 @@
   <div class="container px-4 py-5" id="hanging-icons">
     <h2 class="pb-2 border-bottom">Services</h2>
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-      <div class="col d-flex align-items-start" style="margin-left: 10rem">
+      <div class="col d-flex align-items-start">
         <div>
           <h3 class="fs-2 text-body-emphasis">Plant Disease Detection</h3>
-         
+
           <a href="#" class="btn btn-danger pd-btn"> Scan Image </a>
         </div>
       </div>
-      <div class="col d-flex align-items-start" style="margin-left: 10rem">
+      <div class="col d-flex align-items-start">
         <div>
           <h3 class="fs-2 text-body-emphasis ">Pest Infestation Detection</h3>
-         
+
           <a href="#" class="btn btn-danger pi-btn"> Scan Image </a>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <div>
+          <h3 class="fs-2 text-body-emphasis ">Real time monitoring</h3>
+
+          <a href="#" class="btn btn-success rt-btn"> Start Tracking </a>
         </div>
       </div>
     </div>
@@ -24,11 +31,16 @@
   document
     .querySelector(".pd-btn")
     .addEventListener("click", () => {
-    window.location.href = "/disease";
-  });
+      window.location.href = "/disease";
+    });
   document
     .querySelector(".pi-btn")
     .addEventListener("click", () => {
-    window.location.href = "/pest";
-  });
+      window.location.href = "/pest";
+    });
+  document
+    .querySelector(".rt-btn")
+    .addEventListener("click", () => {
+      window.location.href = "/realtime";
+    });
 </script>
