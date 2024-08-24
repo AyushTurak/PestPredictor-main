@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import GoogleStrategy from "passport-google-oauth2";
-import session from "express-session";
+// import session from "express-session";
 import env from "dotenv";
 
 
@@ -25,20 +25,22 @@ env.config();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"))
 
-// app.use(passport.initialize());
+app.use(passport.initialize());
 // app.use(passport.session());
 
-// const db = new pg.Client({
-//   user: process.env.PG_USER,
-//   host: process.env.PG_HOST,
-//   database: process.env.PG_DATABASE,
-//   password: process.env.PG_PASSWORD,
-//   port: process.env.PG_PORT,
-// });
-// db.connect();
+const db = new pg.Client({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
+});
+db.connect();
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.render("home.ejs"); // No need for the full path, just the filename without .ejs
+  const result = await db.query("SELECT * FROM pest");
+  console.log(result.rows);
 });
 
 app.get("/sign-up", (req, res) => {
