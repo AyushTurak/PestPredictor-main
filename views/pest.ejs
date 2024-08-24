@@ -2,74 +2,29 @@
   <div class="container">
     <div class="row align-items-center g-lg-5 py-5">
       <div class="col-lg-7 text-center text-lg-start">
-        <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">
-          Pest Infestation Detection
-        </h1>
-        <p class="col-lg-10 fs-4">
-          Upload your image to scan for any possible infections
-        </p>
+        <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Pest Detection</h1>
+        <p class="col-lg-10 fs-4">Upload your image to detect pests</p>
       </div>
-
       <div class="col-md-10 mx-auto col-lg-5">
-        <form id="upload-form" class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
-          <input type="file" class="form-control" id="file-input" style="margin-bottom: 1rem" name="pestImage" />
-
+        <form id="upload-form" action="/pest" method="POST" enctype="multipart/form-data"
+          class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
+          <input type="file" class="form-control" id="file-input" style="margin-bottom: 1rem" name="pInput" />
           <button class="w-100 btn btn-primary" type="submit">Upload</button>
         </form>
-
       </div>
-      <div class="card text-bg-danger mb-3" style="max-width: 18rem;">
-        <div class="card-header"></div>
-        <div class="card-body">
-          <h5 class="card-title" id="predicted-class"></h5>
-          <p class="card-text" id="confidence"></p>
+      <% if (locals.prediction) { %>
+        <div class="card text-bg-warning mb-3" style="max-width: 18rem;">
+          <div class="card-header">Pest Prediction</div>
+          <div class="card-body">
+            <h5 class="card-title" id="predicted-class">
+              <%= prediction.predicted_class %>
+            </h5>
+            <p class="card-text" id="confidence">
+              <%= prediction.confidence %>
+            </p>
+          </div>
         </div>
-      </div>
+        <% } %>
     </div>
   </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const fileInput = document.getElementById('file-input');
-      const uploadForm = document.getElementById('upload-form');
-      const predictionResult = document.getElementById('prediction-result');
-      const predictedClassElement = document.getElementById('predicted-class');
-      const confidenceElement = document.getElementById('confidence');
-
-      uploadForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const file = fileInput.files[0];
-
-        if (!file) {
-          alert('Please select a file!');
-          return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-          const response = await fetch('http://localhost:5000/predictPest', {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Accept': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-
-          const data = await response.json();
-          predictedClassElement.textContent = `Pest: ${data.predicted_class}`;
-          confidenceElement.textContent = `Accuracy: ${data.confidence}`;
-          predictionResult.style.display = 'block';
-        } catch (error) {
-          console.error('There was an error!', error);
-        }
-      });
-    });
-  </script>
-
   <%- include("partials/footer.ejs") %>
