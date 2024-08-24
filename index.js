@@ -35,8 +35,7 @@ db.connect();
 
 app.get("/", async (req, res) => {
   res.render("home.ejs"); // No need for the full path, just the filename without .ejs
-  const result = await db.query("SELECT * FROM pest");
-  console.log(result.rows);
+
 });
 
 app.get("/sign-up", (req, res) => {

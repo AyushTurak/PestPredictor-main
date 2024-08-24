@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +11,21 @@
       height: 480px;
       border: 1px solid black;
     }
+
     #capturedImage {
       display: block;
       margin-top: 10px;
       max-width: 100%;
       height: auto;
     }
+
     .predictionResult {
       margin-top: 10px;
       font-weight: bold;
     }
   </style>
 </head>
+
 <body>
   <video id="video" autoplay></video>
   <canvas id="canvas" style="display: none;"></canvas>
@@ -78,16 +82,18 @@
 
     setInterval(() => {
       captureImageAndSend('http://127.0.0.1:5000/predictPest', (data) => {
-        pestPrediction.textContent = `Predicted Pest: ${data.predicted_class} (Confidence: ${data.confidence.toFixed(2)})`;
+        pestPrediction.textContent = `Predicted Pest: ${data.predicted_class} (Accuracy: ${data.confidence.toFixed(2)})`;
       });
-    }, 10000); 
+    }, 10000);
 
     setInterval(() => {
       captureImageAndSend('http://127.0.0.1:5000/predict', (data) => {
         // Display the disease prediction result
-        diseasePrediction.textContent = `Predicted Disease: ${data.class_name} (Confidence: ${data.confidence.toFixed(2)})`;
+        diseasePrediction.textContent = `Predicted Disease: ${data.class_name} (Accuracy: ${data.confidence.toFixed(2)})`;
+      
       });
     }, 16000); // 16 seconds interval
   </script>
 </body>
+
 </html>
