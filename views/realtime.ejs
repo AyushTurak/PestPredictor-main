@@ -1,40 +1,101 @@
-<%- include("partials/header.ejs") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Capture and Prediction</title>
+  <style>
+    #video {
+      width: 640px;
+      height: 480px;
+      border: 1px solid black;
+    }
+    #capturedImage {
+      display: block;
+      margin-top: 10px;
+      max-width: 100%;
+      height: auto;
+    }
+    .predictionResult {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
   <video id="video" autoplay></video>
   <canvas id="canvas" style="display: none;"></canvas>
   <img id="capturedImage" alt="Captured Image" />
+  <div id="pestPrediction" class="predictionResult">Waiting for pest predictions...</div>
+  <div id="diseasePrediction" class="predictionResult">Waiting for disease predictions...</div>
+
   <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const capturedImage = document.getElementById('capturedImage');
+    const pestPrediction = document.getElementById('pestPrediction');
+    const diseasePrediction = document.getElementById('diseasePrediction');
 
     // Access the camera
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
         video.srcObject = stream;
-
-        // Wait for the video metadata to be loaded
-        video.addEventListener('loadedmetadata', () => {
-          // Capture image after 10 seconds
-          setTimeout(() => {
-            // Set canvas dimensions equal to the video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Draw the current video frame onto the canvas
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Convert canvas to an image
-            const imageData = canvas.toDataURL('image/png');
-
-            // Display the captured image
-            capturedImage.src = imageData;
-            capturedImage.style.display = 'block';
-          }, 10000);  // 10 seconds
-        });
       })
       .catch((err) => {
         console.error('Error accessing camera: ', err);
       });
+
+    // Function to capture the image and send it to the server
+    function captureImageAndSend(endpoint, callback) {
+      // Set canvas dimensions equal to the video
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Draw the current video frame onto the canvas
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert canvas to an image
+      canvas.toBlob((blob) => {
+        const formData = new FormData();
+        formData.append('file', blob, 'captured_image.png');
+
+        // Send the image to the backend server
+        fetch(endpoint, {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(`Prediction from ${endpoint}:`, data);
+            // Display the captured image
+            capturedImage.src = URL.createObjectURL(blob);
+            capturedImage.style.display = 'block';
+
+            // Call the callback function with the prediction data
+            callback(data);
+          })
+          .catch((error) => {
+            console.error(`Error during fetch from ${endpoint}:`, error);
+          });
+      }, 'image/png');
+    }
+
+    // Start the interval for pest predictions (every 10 seconds)
+    setInterval(() => {
+      captureImageAndSend('http://127.0.0.1:5000/predictPest', (data) => {
+        // Display the pest prediction result
+        pestPrediction.textContent = `Predicted Pest: ${data.predicted_class} (Confidence: ${data.confidence.toFixed(2)})`;
+      });
+    }, 10000); // 10 seconds interval
+
+    // Start the interval for disease predictions (every 16 seconds)
+    setInterval(() => {
+      captureImageAndSend('http://127.0.0.1:5000/predict', (data) => {
+        // Display the disease prediction result
+        diseasePrediction.textContent = `Predicted Disease: ${data.class_name} (Confidence: ${data.confidence.toFixed(2)})`;
+      });
+    }, 16000); // 16 seconds interval
   </script>
-  <%- include("partials/footer.ejs") %>
+</body>
+</html>
